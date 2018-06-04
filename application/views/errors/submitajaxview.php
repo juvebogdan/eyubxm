@@ -1,0 +1,2 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); ?>
+<div class="alert <?php echo $type ?> alert-dismissible" id="successalert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4><i class="icon fa <?php echo $icon ?>"></i><?php echo $result?></h4><?php echo $message?></div>
