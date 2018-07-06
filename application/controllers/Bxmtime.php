@@ -45,7 +45,7 @@ class Bxmtime extends MY_Controller {
 		}		
 		else {
 			//redirect('https://fsobxmeyu.com/index.php','refresh');
-			redirect('http://localhost/index.php','refresh');
+			redirect('http://www.fsobxmeyu.com/login/login.php','refresh');
 		}
   	}
 
@@ -686,7 +686,6 @@ class Bxmtime extends MY_Controller {
 
 		$this->load->model('employee');
 		$this->load->model('manager');
-
 		$employee  = $this->employee->get_employee($user);
 
 		$fullname = $employee[0]->name;

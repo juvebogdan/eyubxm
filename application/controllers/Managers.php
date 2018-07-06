@@ -227,6 +227,13 @@ class Managers extends MY_Controller {
 		$data['today'] = DateTime::createFromFormat('Y-m-d', date('Y-m-d'));
 		$this->load->view('managers/taskoverview',$data);
 	}
+	
+	public function cars() {
+		$this->load->model('cars');
+		$data['name'] = $this->name;
+		$data['cars'] = $this->cars->get_all_cars();
+		$this->load->view('managers/cars',$data);
+	}
 
 	public function export() {
 		//load our new PHPExcel library
@@ -342,13 +349,6 @@ class Managers extends MY_Controller {
 		$data['name'] = $this->name;
 		$data['carproblems'] = $this->cars->get_all_problems();
 		$this->load->view('managers/carproblems',$data);
-	}	
-
-	public function cars() {
-		$this->load->model('cars');
-		$data['name'] = $this->name;
-		$data['cars'] = $this->cars->get_all_cars();
-		$this->load->view('managers/cars',$data);
 	}					
 
 	private function email($user,$type,$status) {
@@ -399,7 +399,7 @@ class Managers extends MY_Controller {
  			foreach($vacation as $row) {
 				$this->email->attach($this->config->item('server_root') . "/eyubxm/uploads/" . $row->filename);				
 			}
-			$this->email->cc(array($manageremail,'bogdan.djukic@ericsson.com','aleksandar.milojevic@ericsson.com','dusan.milosevic@ericsson.com','veljko.milosavljevic@ericsson.com'));       	
+			$this->email->cc(array($manageremail,'aleksandar.milojevic@ericsson.com','dusan.milosevic@ericsson.com','veljko.milosavljevic@ericsson.com'));       	
         }
         else if ($type=='payed leave' && $status==1) {
         	$this->load->model('payedleave');
@@ -407,7 +407,7 @@ class Managers extends MY_Controller {
  			foreach($payedleave as $row) {
 				$this->email->attach($this->config->item('server_root') . "/eyubxm/uploads/" . $row->filename);				
 			}
-			$this->email->cc(array($manageremail,'bogdan.djukic@ericsson.com','aleksandar.milojevic@ericsson.com','dusan.milosevic@ericsson.com','veljko.milosavljevic@ericsson.com'));          	
+			$this->email->cc(array($manageremail,'aleksandar.milojevic@ericsson.com','dusan.milosevic@ericsson.com','veljko.milosavljevic@ericsson.com'));          	
         }
         else {
         	$this->email->cc($manageremail);
@@ -460,7 +460,7 @@ class Managers extends MY_Controller {
         // Set email preferences
         $this->email->from($from['email'], $from['name']);
         $this->email->to($to);
-        $this->email->cc(array($manageremail,'bogdan.djukic@ericsson.com','aleksandar.milojevic@ericsson.com','dusan.milosevic@ericsson.com','veljko.milosavljevic@ericsson.com'));
+        $this->email->cc(array($manageremail,'aleksandar.milojevic@ericsson.com','dusan.milosevic@ericsson.com','veljko.milosavljevic@ericsson.com'));
         $this->email->subject($subject);
         $this->email->message($message);
         // Ready to send email and check whether the email was successfully sent
