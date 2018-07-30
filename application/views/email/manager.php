@@ -22,6 +22,8 @@ a.button {
 
 <body>
 <p>Your request for <?php echo $type ?> has been <?php echo $status ?></p>
+<p>Manager Response: </p>
+<p><?php echo $managerResponse ?></p>
 <p>Please login to BXM Time report for more info</p>
 <p>Regards</p>
 </br>

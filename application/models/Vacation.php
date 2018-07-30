@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Vacation extends MY_Model {
 
-	function insert_vacation($user,$files,$filenames) {
+	function insert_vacation($user,$files) {
 		$datum = explode(' - ',$this->input->post('date'));
 
 	    $datum1 = DateTime::createFromFormat('d/m/Y', $datum[0]);
@@ -26,7 +26,7 @@ class Vacation extends MY_Model {
 					);
 
 		$this->db->insert('vacation',$data);
-		$this->insertfiles($this->db->insert_id(),$filenames);	
+		//$this->insertfiles($this->db->insert_id(),$filenames);	
 	}	
 
 	function get_all($user) {

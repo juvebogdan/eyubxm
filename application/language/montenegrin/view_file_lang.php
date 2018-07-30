@@ -75,3 +75,4 @@ $lang['Assigned to'] = 'Dodijeljen';
 $lang['Status'] = 'Status';
 $lang['Deadline'] = 'Rok';
 $lang['Created'] = 'Kreiran';
+$lang['Overtime Type'] = 'Tip Prekovremenog';

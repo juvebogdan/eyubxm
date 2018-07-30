@@ -20,9 +20,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
         <li><a href="<?php echo base_url()?>bxmtime/vacation"><i class="fa fa-calendar-o"></i> <span><?php echo $this->lang->line('Vacation') ?></span></a></li>
         <li><a href="<?php echo base_url()?>bxmtime/sickleave"><i class="fa fa-heartbeat"></i> <span><?php echo $this->lang->line('Sick leave') ?></span></a></li>
         <li class="active"><a href="<?php echo base_url()?>bxmtime/taskoverview"><i class="fa fa-desktop"></i> <span><?php echo $this->lang->line('Task Overview') ?></span></a></li>
-        <li><a href="<?php echo base_url()?>bxmtime/cars"><i class="fa fa-car"></i> <span>Dodavanje vozila</span></a></li>
-        <li><a href="<?php echo base_url()?>bxmtime/kilometraza"><i class="fa fa-dashboard"></i> <span>Kilometraza</span></a></li>         
-        <li><a href="<?php echo base_url()?>bxmtime/carproblems"><i class="fa fa-legal"></i> <span>Problemi sa vozilima</span></a></li>                       
+        <li><a href="<?php echo base_url()?>preventive/"><i class="fa fa-list-alt"></i> <span>Preventive</span></a></li>                       
       </ul>      
       <!-- /.sidebar-menu -->
     </section>
@@ -52,34 +50,34 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
         <div class="box-body">
             <div class="table-responsive">
               <table id="tasktable" class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                      <th class="text-center"><?php echo $this->lang->line('Subject') ?></th>
-                      <th class="text-center"><?php echo $this->lang->line('Description') ?></th>
-                      <th class="text-center"><?php echo $this->lang->line('Assigned to') ?></th>
-                      <th class="text-center"><?php echo $this->lang->line('Status') ?></th>
-                      <th class="text-center"><?php echo $this->lang->line('Deadline') ?></th>
-                      <th class="text-center"><?php echo $this->lang->line('Created') ?></th>
-                      <th class="text-center"><?php echo $this->lang->line('Action') ?></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach($tasks as $row):?>
-                    <tr>
-                      <td class="text-center"><?php echo $row->subject ?></td>
-                      <td class="text-center"><?php echo $row->description ?></td>
-                      <td class="text-center"><?php echo $row->assignedto ?></td>
-                      <?php if(date_diff($today,DateTime::createFromFormat('Y-m-d', $row->deadline))->invert == 1):?>
-                      <td class="text-center"><small class="label label-danger"><i class="fa fa-clock-o"></i><?php echo $this->lang->line('Overdue') ?></small></td> 
-                      <?php else:?>
-                      <td class="text-center"><small class="label label-warning"><i class="fa fa-clock-o"></i><?php echo $this->lang->line('Pending') ?></small></td>
-                      <?php endif;?>
-                      <td class="text-center"><?php echo $row->deadline ?></td>
-                      <td class="text-center"><?php echo $row->datum ?></td>
-                      <td class="text-center"><button class="btn btn-info btn-sm taskedit" id="<?php echo $row->id?>"><span class="glyphicon glyphicon-edit"></span></button>&nbsp;</td>                      
-                    </tr>
-                  <?php endforeach;?>                  
-                    </tbody>                  
+                  <thead>
+                  <tr>
+                    <th class="text-center"><?php echo $this->lang->line('Subject') ?></th>
+                    <th class="text-center"><?php echo $this->lang->line('Description') ?></th>
+                    <th class="text-center"><?php echo $this->lang->line('Assigned to') ?></th>
+                    <th class="text-center"><?php echo $this->lang->line('Status') ?></th>
+                    <th class="text-center"><?php echo $this->lang->line('Deadline') ?></th>
+                    <th class="text-center"><?php echo $this->lang->line('Created') ?></th>
+                    <th class="text-center"><?php echo $this->lang->line('Action') ?></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <?php foreach($tasks as $row):?>
+                  <tr>
+                    <td class="text-center"><?php echo $row->subject ?></td>
+                    <td class="text-center"><?php echo $row->description ?></td>
+                    <td class="text-center"><?php echo $row->assignedto ?></td>
+                    <?php if(date_diff($today,DateTime::createFromFormat('Y-m-d', $row->deadline))->invert == 1):?>
+                    <td class="text-center"><small class="label label-danger"><i class="fa fa-clock-o"></i><?php echo $this->lang->line('Overdue') ?></small></td> 
+                    <?php else:?>
+                    <td class="text-center"><small class="label label-warning"><i class="fa fa-clock-o"></i><?php echo $this->lang->line('Pending') ?></small></td>
+                    <?php endif;?>
+                    <td class="text-center"><?php echo $row->deadline ?></td>
+                    <td class="text-center"><?php echo $row->datum ?></td>
+                    <td class="text-center"><button class="btn btn-info btn-sm taskedit" id="<?php echo $row->id?>"><span class="glyphicon glyphicon-edit"></span></button>&nbsp;</td>                      
+                  </tr>
+                <?php endforeach;?>                  
+                  </tbody>                  
               </table>
             </div>
         </div>

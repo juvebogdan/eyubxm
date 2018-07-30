@@ -22,9 +22,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
         <li><a href="<?php echo base_url()?>managers/overviewdaysoff"><i class="fa fa-paper-plane"></i> <span>Day off status</span></a></li>
         <li><a href="<?php echo base_url()?>managers/tasks"><i class="fa fa-tasks"></i> <span>Submit Task</span></a></li>
         <li><a href="<?php echo base_url()?>managers/taskoverview"><i class="fa fa-desktop"></i> <span>Task Overview</span></a></li>
-        <li><a href="<?php echo base_url()?>managers/kilometraza"><i class="fa fa-dashboard"></i> <span>Pregled kilometraze</span></a></li> 
-        <li><a href="<?php echo base_url()?>managers/carproblems"><i class="fa fa-legal"></i> <span>Problemi sa vozilima</span></a></li>
-		<li><a href="<?php echo base_url()?>managers/cars"><i class="fa fa-car"></i> <span>Spisak vozila</span></a></li>
+        <li><a href="<?php echo base_url()?>managers/preventive/"><i class="fa fa-list-alt"></i> <span>Preventive</span></a></li>
       </ul>
       <!-- /.sidebar-menu -->
     </section>
@@ -48,8 +46,23 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
     <div class="row">
       <div class="col-md-12">
         <div class="box box-solid box-primary">
-        <div class="box-header">
-              <h3 class="box-title">Overtime for <?php echo date('F Y'); ?></h3>
+        <div class="box-header finda">
+            <select id='overtimeperiod' name="overtimeperiod" style='color: black;padding: 5px;'>
+              <option></option>
+              <option value="01">January</option>
+              <option value="02">February</option>
+              <option value="03">March</option>
+              <option value="04">April</option>
+              <option value="05">May</option>
+              <option value="06">June</option>
+              <option value="07">July</option>
+              <option value="08">August</option>
+              <option value="09">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+              <a class="btn btn-success btn-sm exportdata pull-right" href="<?php echo base_url();?>managers/export/<?php echo date('m')?>"><span class="glyphicon glyphicon-download-alt"></span> Export to Excel</a>
         </div>
         <div class="box-body">
             <div class="table-responsive">
@@ -62,6 +75,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                       <th class="text-center">Description</th>
                       <th class="text-center">Date</th>
                       <th class="text-center">Status</th>
+                      <th class="text-center">Overtime Type</th>
                       <th class="text-center">Comment</th>
                       <th class="text-center">Type</th>
                     </tr>
@@ -81,6 +95,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                       <?php elseif($row->status == 2):?>
                       <td class="text-center"><small class="label label-danger"><i class="fa fa-clock-o"></i> Declined</small></td>
                       <?php endif;?>
+                      <td class="text-center"><?php echo $row->overtime_type ?></td>
                       <td class="text-center"><?php echo $row->comment ?></td>
                       <td class="text-center">Overtime Day</td>
                     </tr>
@@ -89,7 +104,6 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                     <tr>
                       <td class="text-center"><?php echo $row->signum ?></td>
                       <td class="text-center"><?php echo $row->number ?></td>
-                      <td class="text-center"></td>
                       <td class="text-center"><?php echo $row->ticket_number ?></td>
                       <td class="text-center"><?php echo $row->description ?></td>
                       <td class="text-center"><?php echo $row->date ?></td>
@@ -100,6 +114,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                       <?php elseif($row->status == 2):?>
                       <td class="text-center"><small class="label label-danger"><i class="fa fa-clock-o"></i> Declined</small></td>
                       <?php endif;?>
+                      <td class="text-center"><?php echo $row->overtime_type ?></td>
                       <td class="text-center"><?php echo $row->comment ?></td>
                       <td class="text-center">Overtime Night</td>
                     </tr>
@@ -135,6 +150,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <!-- page script -->
 <script>
 var table;
+var baseurl = '<?php echo base_url();?>';
   $(function () {
     $('#overtimetable').DataTable({
       "paging": true,
@@ -147,6 +163,18 @@ var table;
       "bDestroy": true
     });
   });
+      function reinitializeTable() {
+      $('#overtimetable').DataTable({
+        "paging": true,
+        "pageLength": 10,
+        "lengthChange": false,
+        "searching": false,
+        "ordering": false,
+        "info": true,
+        "autoWidth": false,
+        "bDestroy": true,      
+      });
+    }
   (function(){
     var myDiv = document.getElementById("overlay"),
 
@@ -160,6 +188,29 @@ var table;
 
     show();
   })();
+
+$('#overtimeperiod').on('change', function() {
+      var formData = new FormData();
+      formData.append('period',$( "#overtimeperiod option:selected" ).val());
+      $(".exportdata").attr("href", baseurl + 'managers/export/' + $( "#overtimeperiod option:selected" ).val());
+      $.ajax({         
+        type: 'POST',
+        url: '<?php echo base_url(); ?>managers/populateoverview',
+        data: formData,
+        contentType: false,       
+        cache: false, 
+        dataType: 'json',            
+        processData:false,       
+        success: function(result){ 
+          $("#overtimetable").dataTable().fnDestroy();
+          $('#overtimetable').html(result.table);
+          reinitializeTable();
+          $('.ajax').prop('disabled',false);          
+        }
+      });
+});
+
+
 </script>
 </body>
 </html>

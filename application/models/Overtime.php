@@ -10,6 +10,7 @@ class Overtime extends MY_Model {
 					  'number' => $this->input->post('overtime'),
 					  'date' => $datum,
 					  'status' => 0,
+					  'overtime_type' => $this->input->post('overtimetype'),
 					  'ticket_number' => $this->input->post('ticket'),
 					  'description' => $this->input->post('description'),
 					  'comment' => ""
@@ -25,6 +26,7 @@ class Overtime extends MY_Model {
 					  'number' => $this->input->post('overtime'),
 					  'date' => $datum,
 					  'status' => 0,
+					  'overtime_type' => $this->input->post('overtimetype'),
 					  'ticket_number' => $this->input->post('ticket'),
 					  'description' => $this->input->post('description'),
 					  'comment' => ""
@@ -39,7 +41,7 @@ class Overtime extends MY_Model {
 	}
 
 	function get_all_overtime_managers($table) {
-		$query = $this->db->query('select * from ' . $table . ' where MONTH(date)=' . date('m') . ' and status=0 union select * from ' . $table . '_holiday where MONTH(date)=' . date('m') . ' and status=0');
+		$query = $this->db->query('select * from ' . $table . ' where status=0 union select * from ' . $table . '_holiday where status=0');
 		return $query->result();
 	}	
 	
@@ -51,8 +53,8 @@ class Overtime extends MY_Model {
 		$query = $this->db->delete($type);
 	}
 
-	function select_all($table) {
-		$query = $this->db->query('select * from ' . $table . ' where MONTH(date)=' . date('m') . " and status=1 " . ' union select * from ' . $table . '_holiday where MONTH(date)=' . date('m') . " and status=1");
+	function select_all($table,$period) {
+		$query = $this->db->query('select * from ' . $table . ' where MONTH(date)=' . $period . " and YEAR(date)='" . date('Y')  . "' and status=1 " . ' union select * from ' . $table . '_holiday where MONTH(date)=' . $period . " and YEAR(date)='" . date('Y')  . "' and status=1");
 		return $query->result();		
 	}
 	function check_drzavni_praznik() {

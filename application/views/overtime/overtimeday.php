@@ -19,10 +19,8 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
         <li><a href="<?php echo base_url()?>bxmtime/overview"><i class="fa fa-users"></i> <span><?php echo $this->lang->line('Overview') ?></span></a></li>
         <li><a href="<?php echo base_url()?>bxmtime/vacation"><i class="fa fa-calendar-o"></i> <span><?php echo $this->lang->line('Vacation') ?></span></a></li>
         <li><a href="<?php echo base_url()?>bxmtime/sickleave"><i class="fa fa-heartbeat"></i> <span><?php echo $this->lang->line('Sick leave') ?></span></a></li>
-        <li><a href="<?php echo base_url()?>bxmtime/taskoverview"><i class="fa fa-desktop"></i> <span><?php echo $this->lang->line('Task Overview') ?></span></a></li>
-        <li><a href="<?php echo base_url()?>bxmtime/cars"><i class="fa fa-car"></i> <span>Dodavanje vozila</span></a></li>
-        <li><a href="<?php echo base_url()?>bxmtime/kilometraza"><i class="fa fa-dashboard"></i> <span>Kilometraza</span></a></li>         
-        <li><a href="<?php echo base_url()?>bxmtime/carproblems"><i class="fa fa-legal"></i> <span>Problemi sa vozilima</span></a></li>                       
+        <li><a href="<?php echo base_url()?>bxmtime/taskoverview"><i class="fa fa-desktop"></i> <span><?php echo $this->lang->line('Task Overview') ?></span></a></li>   
+        <li><a href="<?php echo base_url()?>preventive/"><i class="fa fa-list-alt"></i> <span>Preventive</span></a></li>                     
       </ul>
       <!-- /.sidebar-menu -->
     </section>
@@ -83,6 +81,16 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
               </div>
               <div class="row">
                 <div class="col-md-12">
+                      <label><?php echo $this->lang->line('Overtime Type') ?>:</label>
+                      <select class="form-control select2" name="overtimetype" style="width: 100%;">
+                        <option value="tip1">tip 1</option>
+                        <option value="tip2">tip 2</option>
+                        <option value="tip3">tip 3</option>
+                      </select>                
+                </div>              
+              </div>               
+              <div class="row">
+                <div class="col-md-12">
                     <label><?php echo $this->lang->line('Description') ?></label>
                     <textarea class="form-control" name="description" rows="10" placeholder="<?php echo $this->lang->line('Short description optional') ?>"></textarea>
                 </div>              
@@ -117,6 +125,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                       <th class="text-center"><?php echo $this->lang->line('Description') ?></th>
                       <th class="text-center"><?php echo $this->lang->line('Date') ?></th>
                       <th class="text-center">Status</th>
+                      <th class="text-center"><?php echo $this->lang->line('Overtime Type') ?></th>
                       <th class="text-center"><?php echo $this->lang->line('Comment') ?></th>
                       <th class="text-center"><?php echo $this->lang->line('Action') ?></th>
                     </tr>
@@ -136,6 +145,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                       <?php elseif($row->status == 2):?>
                       <td class="text-center"><small class="label label-danger"><i class="fa fa-clock-o"></i> <?php echo $this->lang->line('Declined') ?></small></td>
                       <?php endif;?>
+                      <td class="text-center"><?php echo $row->overtime_type ?></td>
                       <td class="text-center"><?php echo $row->comment ?></td>
                       <?php if($row->status == 0):?>
                       <td class="text-center"><a href="<?php echo base_url('bxmtime/delete/'. $row->id . '/' . $row->identifier);?>" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;</td>

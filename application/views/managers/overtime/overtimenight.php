@@ -22,9 +22,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
         <li><a href="<?php echo base_url()?>managers/overviewdaysoff"><i class="fa fa-paper-plane"></i> <span>Day off status</span></a></li>
         <li><a href="<?php echo base_url()?>managers/tasks"><i class="fa fa-tasks"></i> <span>Submit Task</span></a></li>
         <li><a href="<?php echo base_url()?>managers/taskoverview"><i class="fa fa-desktop"></i> <span>Task Overview</span></a></li>
-        <li><a href="<?php echo base_url()?>managers/kilometraza"><i class="fa fa-dashboard"></i> <span>Pregled kilometraze</span></a></li> 
-        <li><a href="<?php echo base_url()?>managers/carproblems"><i class="fa fa-legal"></i> <span>Problemi sa vozilima</span></a></li>  
-		<li><a href="<?php echo base_url()?>managers/cars"><i class="fa fa-car"></i> <span>Spisak vozila</span></a></li>
+        <li><a href="<?php echo base_url()?>managers/preventive/"><i class="fa fa-list-alt"></i> <span>Preventive</span></a></li>
       </ul>
       <!-- /.sidebar-menu -->
     </section>
@@ -62,6 +60,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                       <th class="text-center">Description</th>
                       <th class="text-center">Date</th>
                       <th class="text-center">Status</th>
+                      <th class="text-center">Overtime Type</th>
                       <th class="text-center">Action</th>
                     </tr>
                     </thead>
@@ -74,6 +73,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                       <td class="text-center"><?php echo $row->description ?></td>
                       <td class="text-center"><?php echo $row->date ?></td>
                       <td class="text-center"><small class="label label-warning"><i class="fa fa-clock-o"></i> Pending</small></td>
+                      <td class="text-center"><?php echo $row->overtime_type ?></td>
                       <td class="text-center"><button class="btn btn-info btn-sm overtimeedit" id="<?php echo $row->id . "/" . $row->identifier; ?>"><span class="glyphicon glyphicon-edit"></span></button>&nbsp;</td>
                     </tr>
                   <?php endforeach;?>

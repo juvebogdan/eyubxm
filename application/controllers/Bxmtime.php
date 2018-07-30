@@ -2,9 +2,27 @@
 
 class Bxmtime extends MY_Controller {
 
-	private $user;
-	private $user_type;
-	private $name;
+	protected $user;
+	protected $user_type;
+	protected $name;
+	// protected $emailConfig =  [
+ //            'protocol' => 'smtp', 
+ //            'smtp_host' => 'ssl://smtp.gmail.com', 
+ //            'smtp_port' => 465, 
+ //            'smtp_user' => 'krivokapic.bogdan10@gmail.com', 
+ //            'smtp_pass' => '', 
+ //            'mailtype' => 'html', 
+ //            'charset' => 'iso-8859-1'
+ //        ];
+	protected $emailConfig = [
+            'protocol' => 'mail', 
+            'smtp_host' => 'mail.mtel.me', 
+            'smtp_port' => 25, 
+            'smtp_user' => '', 
+            'smtp_pass' => '', 
+            'mailtype' => 'html', 
+            'charset' => 'iso-8859-1'
+        ];       
 
 	public function getUser() {
 		return $this->user;
@@ -60,6 +78,7 @@ class Bxmtime extends MY_Controller {
 	public function addovertime($type)
 	{
 		$this->form_validation->set_rules('overtime','Number of overtime hours','required|trim|numeric');
+		$this->form_validation->set_rules('overtimetype','Overtime Type','required|trim');
 		//is_current_month custom rule to enable submit for current month only
 		$this->form_validation->set_rules('date','Date','required|trim|is_current_month');
 		$this->form_validation->set_rules('ticket','Ticket number','required|trim|numeric');
@@ -113,8 +132,8 @@ class Bxmtime extends MY_Controller {
 	public function overview() {
 		$this->load->model("overtime");
 		$data['name'] = $this->name;
-		$data['overtime_table_day'] = $this->overtime->select_all('overtimeday');
-		$data['overtime_table_night'] = $this->overtime->select_all('overtimenight');		
+		$data['overtime_table_day'] = $this->overtime->select_all('overtimeday', date('m'));
+		$data['overtime_table_night'] = $this->overtime->select_all('overtimenight', date('m'));		
 		$this->load->view('overview',$data);		
 	}
 
@@ -133,7 +152,7 @@ class Bxmtime extends MY_Controller {
 
 	public function delete_vacation($id) {
 		$this->load->model('vacation');
-		$this->vacation->deletevacationfiles($id);
+		//$this->vacation->deletevacationfiles($id);
 		$this->vacation->delete_vacation($id,$this->user);
 		redirect('bxmtime/vacation');		
 	}
@@ -147,61 +166,61 @@ class Bxmtime extends MY_Controller {
 			$this->show_error_alert(validation_errors());
 		}
 		else {
-			if(isset($_FILES['multipleFiles']) && count($_FILES['multipleFiles']['name']) > 0){
-				$this->load->helper('string');
-				$error = array();
-				$filenames = array();
-				$this->load->library('upload');
+			// if(isset($_FILES['multipleFiles']) && count($_FILES['multipleFiles']['name']) > 0){
+				// $this->load->helper('string');
+				// $error = array();
+				// $filenames = array();
+				// $this->load->library('upload');
 
-				$number_of_files = count($_FILES['multipleFiles']['name']);
+				// $number_of_files = count($_FILES['multipleFiles']['name']);
 
-				$files = $_FILES;
+				// $files = $_FILES;
 
-				if(!is_dir('uploads')) {
-					mkdir('./uploads',0777,true);
-				}
+				// if(!is_dir('uploads')) {
+				// 	mkdir('./uploads',0777,true);
+				// }
 
-				for($i=0; $i < $number_of_files; $i++) {
+				// for($i=0; $i < $number_of_files; $i++) {
 
-					$_FILES['multipleFiles']['name'] = $files['multipleFiles']['name'][$i];
-					$_FILES['multipleFiles']['type'] = $files['multipleFiles']['type'][$i];
-					$_FILES['multipleFiles']['tmp_name'] = $files['multipleFiles']['tmp_name'][$i];
-					$_FILES['multipleFiles']['error'] = $files['multipleFiles']['error'][$i];
-					$_FILES['multipleFiles']['size'] = $files['multipleFiles']['size'][$i];
+				// 	$_FILES['multipleFiles']['name'] = $files['multipleFiles']['name'][$i];
+				// 	$_FILES['multipleFiles']['type'] = $files['multipleFiles']['type'][$i];
+				// 	$_FILES['multipleFiles']['tmp_name'] = $files['multipleFiles']['tmp_name'][$i];
+				// 	$_FILES['multipleFiles']['error'] = $files['multipleFiles']['error'][$i];
+				// 	$_FILES['multipleFiles']['size'] = $files['multipleFiles']['size'][$i];
 
-					$config['upload_path'] = './uploads/';
-					$config['allowed_types'] = 'gif|jpg|png';
-					$config['max_size'] = '5120';
-					$config['max_widht'] = '1920';
-					$config['max_height'] = '1080';
-					$config['overwrite'] = TRUE;
-					$config['remove_spaces'] = TRUE;
+				// 	$config['upload_path'] = './uploads/';
+				// 	$config['allowed_types'] = 'gif|jpg|png';
+				// 	$config['max_size'] = '5120';
+				// 	$config['max_widht'] = '1920';
+				// 	$config['max_height'] = '1080';
+				// 	$config['overwrite'] = TRUE;
+				// 	$config['remove_spaces'] = TRUE;
 
-					//$config['file_name'] = 'Vacation' . $this->input->post('vacationtype') . '_' . $this->user . '_' . date('M') . '_' . $i;
+				// 	//$config['file_name'] = 'Vacation' . $this->input->post('vacationtype') . '_' . $this->user . '_' . date('M') . '_' . $i;
 
-					array_push($filenames,random_string('unique',15) . "." . strtolower(pathinfo($_FILES['multipleFiles']['name'],PATHINFO_EXTENSION)));
+				// 	array_push($filenames,random_string('unique',15) . "." . strtolower(pathinfo($_FILES['multipleFiles']['name'],PATHINFO_EXTENSION)));
 
-					$config['file_name'] = end($filenames);
+				// 	$config['file_name'] = end($filenames);
 
-					$this->upload->initialize($config);
+				// 	$this->upload->initialize($config);
 
-					if(!$this->upload->do_upload('multipleFiles')) {
-						$error['error'] = $this->upload->display_errors();
-						foreach ($filenames as $file) { 
-							//unlink(FCPATH . 'uploads' . '\/' . $file);
-						}				
-					}
-					else {
-						//nothing
-					}
-				}
+				// 	if(!$this->upload->do_upload('multipleFiles')) {
+				// 		$error['error'] = $this->upload->display_errors();
+				// 		foreach ($filenames as $file) { 
+				// 			//unlink(FCPATH . 'uploads' . '\/' . $file);
+				// 		}				
+				// 	}
+				// 	else {
+				// 		//nothing
+				// 	}
+				// }
 
-				if(!empty($error)) {
-					$this->show_error_alert($error['error']);					
-				}
-				else{
+				// if(!empty($error)) {
+				// 	$this->show_error_alert($error['error']);					
+				// }
+				// else{
 					$this->load->model('vacation');
-					$this->vacation->insert_vacation($this->user,$number_of_files,$filenames);
+					$this->vacation->insert_vacation($this->user,'1');
 					$data['type'] = "alert-success";
 					$data['icon'] = "fa-check";
 					$data['result'] = "Success";
@@ -211,12 +230,12 @@ class Bxmtime extends MY_Controller {
 					$vacation_table = $this->load->view('ajax/vacationtable',$data, TRUE);//load updated overtime table
 		            $this->output->set_content_type('application/json')//return json array
 		                         ->set_output(json_encode(array("message" => $result_message, "table" => $vacation_table)));
-		            $this->emailattach($this->user,"Vacation",$number_of_files,$filenames);
-				}
-			}
-			else {
-				$this->show_error_alert("<p>You must upload personal notice</p>");
-			}
+		            $this->emailattach($this->user,"Vacation",'1','');
+				// }
+			// }
+			// else {
+			// 	$this->show_error_alert("<p>You must upload personal notice</p>");
+			// }
 		}
 	}	
 
@@ -533,15 +552,15 @@ class Bxmtime extends MY_Controller {
 		$manageremail = $this->manager->get_manager_by_id($managerid);
 
         // Set SMTP Configuration
-        $emailConfig = [
-            'protocol' => 'mail', 
-            'smtp_host' => 'mail.mtel.me', 
-            'smtp_port' => 25, 
-            'smtp_user' => '', 
-            'smtp_pass' => '', 
-            'mailtype' => 'html', 
-            'charset' => 'iso-8859-1'
-        ];
+        // $emailConfig = [
+        //     'protocol' => 'mail', 
+        //     'smtp_host' => 'mail.mtel.me', 
+        //     'smtp_port' => 25, 
+        //     'smtp_user' => '', 
+        //     'smtp_pass' => '', 
+        //     'mailtype' => 'html', 
+        //     'charset' => 'iso-8859-1'
+        // ];
 
         // Set your email information
         $from = [
@@ -556,7 +575,7 @@ class Bxmtime extends MY_Controller {
         $data['type'] = $type;
         $message =  $this->load->view('email/employee',$data,true);
         // Load CodeIgniter Email library
-        $this->load->library('email', $emailConfig);
+        $this->load->library('email', $this->emailConfig);
         // Sometimes you have to set the new line character for better result
         $this->email->set_newline("\r\n");
         // Set email preferences
@@ -584,16 +603,15 @@ class Bxmtime extends MY_Controller {
 		$manageremail = $this->manager->get_manager_by_id($managerid);
 
         // Set SMTP Configuration
-        $emailConfig = [
-            'protocol' => 'mail', 
-            'smtp_host' => 'mail.mtel.me', 
-            'smtp_port' => 25, 
-            'smtp_user' => '', 
-            'smtp_pass' => '', 
-            'mailtype' => 'html', 
-            'charset' => 'iso-8859-1'
-        ];        
-
+        // $emailConfig = [
+        //     'protocol' => 'mail', 
+        //     'smtp_host' => 'mail.mtel.me', 
+        //     'smtp_port' => 25, 
+        //     'smtp_user' => '', 
+        //     'smtp_pass' => '', 
+        //     'mailtype' => 'html', 
+        //     'charset' => 'iso-8859-1'
+        // ];
         // Set your email information
         $from = [
             'email' => 'FSOTimeReport@ericsson.com',
@@ -607,7 +625,7 @@ class Bxmtime extends MY_Controller {
         $data['type'] = $type;
         $message =  $this->load->view('email/employee',$data,true);
         // Load CodeIgniter Email library
-        $this->load->library('email', $emailConfig);
+        $this->load->library('email', $this->emailConfig);
         // Sometimes you have to set the new line character for better result
         $this->email->set_newline("\r\n");
         // Set email preferences
@@ -617,9 +635,9 @@ class Bxmtime extends MY_Controller {
         $this->email->subject($subject);
         $this->email->message($message);
 
-		foreach($filenames as $file) {
-			$this->email->attach($this->config->item('server_root') . "/eyubxm/uploads/" . $file);				
-		}
+		// foreach($filenames as $file) {
+		// 	$this->email->attach($this->config->item('server_root') . "/eyubxm/uploads/" . $file);				
+		// }
 
         // Ready to send email and check whether the email was successfully sent
         //$this->config->set_item('language', 'english');
@@ -642,15 +660,15 @@ class Bxmtime extends MY_Controller {
 		$manageremail = $this->manager->get_manager_by_id($managerid);
 
         // Set SMTP Configuration
-        $emailConfig = [
-            'protocol' => 'mail', 
-            'smtp_host' => 'mail.mtel.me', 
-            'smtp_port' => 25, 
-            'smtp_user' => '', 
-            'smtp_pass' => '', 
-            'mailtype' => 'html', 
-            'charset' => 'iso-8859-1'
-        ];
+        // $emailConfig = [
+        //     'protocol' => 'mail', 
+        //     'smtp_host' => 'mail.mtel.me', 
+        //     'smtp_port' => 25, 
+        //     'smtp_user' => '', 
+        //     'smtp_pass' => '', 
+        //     'mailtype' => 'html', 
+        //     'charset' => 'iso-8859-1'
+        // ];
 
         // Set your email information
         $from = [
@@ -666,7 +684,7 @@ class Bxmtime extends MY_Controller {
         $data['comment'] = $comment;
         $message =  $this->load->view('email/taskemail',$data,true);
         // Load CodeIgniter Email library
-        $this->load->library('email', $emailConfig);
+        $this->load->library('email', $this->emailConfig);
         // Sometimes you have to set the new line character for better result
         $this->email->set_newline("\r\n");
         // Set email preferences
@@ -694,16 +712,15 @@ class Bxmtime extends MY_Controller {
 		$manageremail = $this->manager->get_manager_by_id($managerid);
 
         // Set SMTP Configuration
-        $emailConfig = [
-            'protocol' => 'mail', 
-            'smtp_host' => 'mail.mtel.me', 
-            'smtp_port' => 25, 
-            'smtp_user' => '', 
-            'smtp_pass' => '', 
-            'mailtype' => 'html', 
-            'charset' => 'iso-8859-1'
-        ];
-
+        // $emailConfig = [
+        //     'protocol' => 'mail', 
+        //     'smtp_host' => 'mail.mtel.me', 
+        //     'smtp_port' => 25, 
+        //     'smtp_user' => '', 
+        //     'smtp_pass' => '', 
+        //     'mailtype' => 'html', 
+        //     'charset' => 'iso-8859-1'
+        // ];
         // Set your email information
         $from = [
             'email' => 'FSOTimeReport@ericsson.com',
@@ -718,7 +735,7 @@ class Bxmtime extends MY_Controller {
         $data['description'] = $description;
         $message =  $this->load->view('email/carproblemsubmit',$data,true);
         // Load CodeIgniter Email library
-        $this->load->library('email', $emailConfig);
+        $this->load->library('email', $this->emailConfig);
         // Sometimes you have to set the new line character for better result
         $this->email->set_newline("\r\n");
         // Set email preferences
@@ -748,17 +765,6 @@ class Bxmtime extends MY_Controller {
 
 		$manageremail = $this->manager->get_manager_by_id($managerid);
 
-        // Set SMTP Configuration
-        $emailConfig = [
-            'protocol' => 'mail', 
-            'smtp_host' => 'mail.mtel.me', 
-            'smtp_port' => 25, 
-            'smtp_user' => '', 
-            'smtp_pass' => '', 
-            'mailtype' => 'html', 
-            'charset' => 'iso-8859-1'
-        ];
-
         // Set your email information
         $from = [
             'email' => 'FSOTimeReport@ericsson.com',
@@ -773,7 +779,7 @@ class Bxmtime extends MY_Controller {
         $data['comment'] = $comment;
         $message =  $this->load->view('email/problememail',$data,true);
         // Load CodeIgniter Email library
-        $this->load->library('email', $emailConfig);
+        $this->load->library('email', $this->emailConfig);
         // Sometimes you have to set the new line character for better result
         $this->email->set_newline("\r\n");
         // Set email preferences

@@ -36,6 +36,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="shortcut icon" href="<?php echo base_url(); ?>dist/img/27810fa.png" />
     <!-- Pace style -->
   <link rel="stylesheet" href="<?php echo base_url(); ?>plugins/pace/pace.min.css">
+  <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+  <link rel="stylesheet" href="<?php echo base_url(); ?>css/jquery.fileupload.css">
+  <link rel="stylesheet" href="<?php echo base_url(); ?>css/flash.css">
   <style>
   .panel-footer {
     background-color: #fff !important;
@@ -80,6 +83,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 }
 p,label,th,td,li {
   font-size: 17px !important;
+}
+.dataTables_filter {
+   display: none;
 }
 
   </style>

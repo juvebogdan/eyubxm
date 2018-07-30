@@ -5,6 +5,24 @@ class Managers extends MY_Controller {
 	private $user;
 	private $user_type;
 	private $name;
+	// protected $emailConfig =  [
+ //            'protocol' => 'smtp', 
+ //            'smtp_host' => 'ssl://smtp.gmail.com', 
+ //            'smtp_port' => 465, 
+ //            'smtp_user' => 'krivokapic.bogdan10@gmail.com', 
+ //            'smtp_pass' => '', 
+ //            'mailtype' => 'html', 
+ //            'charset' => 'iso-8859-1'
+ //        ];
+	protected $emailConfig = [
+            'protocol' => 'mail', 
+            'smtp_host' => 'mail.mtel.me', 
+            'smtp_port' => 25, 
+            'smtp_user' => '', 
+            'smtp_pass' => '', 
+            'mailtype' => 'html', 
+            'charset' => 'iso-8859-1'
+        ];
 
 	public function getUser() {
 		return $this->user;
@@ -84,9 +102,51 @@ class Managers extends MY_Controller {
 	public function overview() {
 		$this->load->model("overtime");
 		$data['name'] = $this->name;
-		$data['overtime_table_day'] = $this->overtime->select_all('overtimeday');
-		$data['overtime_table_night'] = $this->overtime->select_all('overtimenight');		
+		$data['overtime_table_day'] = $this->overtime->select_all('overtimeday', date('m'));
+		$data['overtime_table_night'] = $this->overtime->select_all('overtimenight', date('m'));		
 		$this->load->view('managers/overview',$data);		
+	}
+
+	public function preventive() {
+		$this->load->model('preventivemodel');
+		$data['name'] = $this->name;
+		$data['sites'] = $this->preventivemodel->get_all_sites();
+		$data['types'] = $this->preventivemodel->get_all_types();
+		$this->load->view('managers/preventive',$data);		
+	}
+
+	public function populatepreventive() {
+
+		$this->form_validation->set_rules('tip','Overtime period','required|trim');
+		$this->form_validation->set_rules('status','Overtime period','required|trim');
+
+		if($this->form_validation->run()==FALSE){
+			$this->show_error_alert(validation_errors());
+		}
+		else {
+			$this->load->model("preventivemodel");
+			$data['sites'] = $this->preventivemodel->get_filtered_sites($this->input->post('tip'), $this->input->post('status'));
+			$locations = $this->load->view('ajax/preventivetablemanagers',$data, TRUE);//load updated overtime table	
+		        $this->output->set_content_type('application/json')//return json array
+		                     ->set_output(json_encode(array("table" => $locations)));
+		}		
+	}
+
+	public function populateoverview() {
+
+		$this->form_validation->set_rules('period','Overtime period','required|trim');
+
+		if($this->form_validation->run()==FALSE){
+			$this->show_error_alert(validation_errors());
+		}
+		else {
+			$this->load->model("overtime");
+			$data['overtime_table_day'] = $this->overtime->select_all('overtimeday', $this->input->post('period'));
+			$data['overtime_table_night'] = $this->overtime->select_all('overtimenight', $this->input->post('period'));
+			$overtime_table = $this->load->view('ajax/overviewtablemanagers',$data, TRUE);//load updated overtime table	
+		        $this->output->set_content_type('application/json')//return json array
+		                     ->set_output(json_encode(array("table" => $overtime_table)));
+		}		
 	}
 
 	public function vacation() {
@@ -235,20 +295,20 @@ class Managers extends MY_Controller {
 		$this->load->view('managers/cars',$data);
 	}
 
-	public function export() {
+	public function export($period) {
 		//load our new PHPExcel library
 		$this->load->library('excel');
 		//activate worksheet number 1
 		$this->excel->setActiveSheetIndex(0);
 		//name the worksheet
-		$worksheetname = 'Payroll ' . date('F Y');
+		$worksheetname = 'Overtime';
 		$this->excel->getActiveSheet()->setTitle($worksheetname);
 		$this->excel->getActiveSheet()->getDefaultStyle()->getFont()->setName('Tahoma');
 		$this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(45.29);
 		$this->excel->getActiveSheet()->getRowDimension('1')->setRowHeight(42.75);
 		//set cell A1 content with some text
 
-		$array = array("A"=>"Naziv","B"=>"Redovan rad","C"=>"Nocni rad","D"=>"Prinudni odmor","E"=>"Prekovremeno dan","F"=>"Prekovremeno noc","G"=>"Rad praznik","H"=>"Odmor","I"=>"Drzavni praznik","J"=>"Placeni odmor","K"=>"Trudnicko bolovanje","L"=>"Bolovanje do 70","M"=>"Bolovanje do 80","N"=>"Bolovanje do 90","O"=>"Bolovanje do 100","P"=>"Porodiljsko","Q"=>"Bolovanje preko 70","R"=>"Bolovanje preko 100","S"=>"Vjerski praznik","T"=>"Rad vjerski","U"=>"Korekcija","V"=>"Stimulacija","W"=>"Destimulacija","X"=>"Prevoz","Y"=>"Nocni praznik","Z"=>"Prekovremeno praznik","AA"=>"Prekovremeno praznik nocni");
+		$array = array("A"=>"Signum","B"=>"Overtime Hours","C"=>"Ticket Number","D"=>"Description","E"=>"Date","F"=>"Status","G"=>"Overtime type","H"=>"Comment","I"=>"Type");
 
 		$keys = array_keys($array);
 
@@ -274,15 +334,45 @@ class Managers extends MY_Controller {
 			);			
 		}
 
-		$this->load->model("karnet");
+		$this->load->model("overtime");
 
-		$karnet = $this->karnet->select_all();
+		$overtime_table_day = $this->overtime->select_all('overtimeday', $period);
+		$overtime_table_night = $this->overtime->select_all('overtimenight', $period);	
 
 		$brojac = 2;
 
-		foreach($karnet as $row) {
+		foreach($overtime_table_day as $row) {
 
-			$array = array("A"=>$row->Naziv,"B"=>$row->redovan_rad,"C"=>$row->nocni_rad,"D"=>$row->prinudni,"E"=>$row->prekovremeno_dan,"F"=>$row->prekovremeno_noc,"G"=>$row->rad_praznik,"H"=>$row->odmor,"I"=>$row->drzavni_praznik,"J"=>$row->placeno,"K"=>$row->trudnicko,"L"=>$row->bolovanje_do_70,"M"=>$row->bolovanje_do_80,"N"=>$row->bolovanje_do_90,"O"=>$row->bolovanje_do_100,"P"=>$row->porodiljsko,"Q"=>$row->bolovanje_preko_70,"R"=>$row->bolovanje_preko_100,"S"=>$row->vjerski_praznik,"T"=>$row->rad_vjerski,"U"=>$row->korekcija,"V"=>$row->stimulacija,"W"=>$row->destimulacija,"X"=>$row->prevoz,"Y"=>$row->nocni_praznik,"Z"=>$row->prekovremeno_praznik,"AA"=>$row->prekovremeno_praznik_nocni);
+			$array = array("A"=>$row->signum,"B"=>$row->number,"C"=>$row->ticket_number,"D"=>$row->description,"E"=>$row->date,"F"=>$row->status,"G"=>$row->overtime_type,"H"=>$row->comment,"I"=>"Overtime day");		
+
+			$keys = array_keys($array);
+
+
+			for($i=0;$i<count($array);$i++) {
+				$this->excel->getActiveSheet()->setCellValue($keys[$i] . $brojac, $array[array_keys($array)[$i]]);
+				//change the font size
+				$this->excel->getActiveSheet()->getStyle($keys[$i] . $brojac)->getFont()->setSize(9);
+				//set aligment to center for that merged cell (A1 to D1)
+				$this->excel->getActiveSheet()->getStyle($keys[$i] . $brojac)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+				$this->excel->getActiveSheet()->getStyle($keys[$i] . $brojac)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+				$this->excel->getActiveSheet()->getColumnDimension($keys[$i])->setAutoSize(true);
+
+				$this->excel->getActiveSheet()->getStyle($keys[$i] . $brojac)->applyFromArray(
+				    array(
+				        'borders' => array(
+						    'outline' => array(
+						      'style' => PHPExcel_Style_Border::BORDER_THIN
+						    )
+				        )
+				    )
+				);			
+			}
+			$brojac++;
+
+		}
+		foreach($overtime_table_night as $row) {
+
+			$array = array("A"=>$row->signum,"B"=>$row->number,"C"=>$row->ticket_number,"D"=>$row->description,"E"=>$row->date,"F"=>$row->status,"G"=>$row->overtime_type,"H"=>$row->comment,"I"=>"Overtime night");		
 
 			$keys = array_keys($array);
 
@@ -311,7 +401,7 @@ class Managers extends MY_Controller {
 		}
 
 
-		$filename='Karnet_ECG ' . date('m') . " " . date('Y') . ".xls"; //save our workbook as this file name
+		$filename="Overtime.xls"; //save our workbook as this file name
 		header('Content-Type: application/vnd.ms-excel'); //mime type
 		header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
 		header('Cache-Control: max-age=0'); //no cache
@@ -361,17 +451,6 @@ class Managers extends MY_Controller {
 
 		$manageremail = $this->manager->get_manager_by_id($managerid);
 
-        // Set SMTP Configuration
-        $emailConfig = [
-            'protocol' => 'mail', 
-            'smtp_host' => 'mail.mtel.me', 
-            'smtp_port' => 25, 
-            'smtp_user' => '', 
-            'smtp_pass' => '', 
-            'mailtype' => 'html', 
-            'charset' => 'iso-8859-1'
-        ];
-
         // Set your email information
         $from = [
             'email' => 'FSOTimeReport@ericsson.com',
@@ -383,9 +462,10 @@ class Managers extends MY_Controller {
         //$message = 'Type your gmail message here';
         $data['status'] = $status == 1 ? "approved" : "declined";
         $data['type'] = $type;
+        $data['managerResponse'] = $this->input->post('description');
         $message =  $this->load->view('email/manager',$data,true);
         // Load CodeIgniter Email library
-        $this->load->library('email', $emailConfig);
+        $this->load->library('email', $this->emailConfig);
         // Sometimes you have to set the new line character for better result
         $this->email->set_newline("\r\n");
         // Set email preferences
@@ -431,16 +511,7 @@ class Managers extends MY_Controller {
 
 		$manageremail = $this->manager->get_manager_by_id($managerid);
 
-        // Set SMTP Configuration
-        $emailConfig = [
-            'protocol' => 'mail', 
-            'smtp_host' => 'mail.mtel.me', 
-            'smtp_port' => 25, 
-            'smtp_user' => '', 
-            'smtp_pass' => '', 
-            'mailtype' => 'html', 
-            'charset' => 'iso-8859-1'
-        ];
+        // Set SMTP Configuratio
 
         // Set your email information
         $from = [
@@ -454,7 +525,7 @@ class Managers extends MY_Controller {
         $data['type'] = $type;
         $message =  $this->load->view('email/director',$data,true);
         // Load CodeIgniter Email library
-        $this->load->library('email', $emailConfig);
+        $this->load->library('email', $this->emailConfig);
         // Sometimes you have to set the new line character for better result
         $this->email->set_newline("\r\n");
         // Set email preferences
@@ -476,6 +547,95 @@ class Managers extends MY_Controller {
 		$result_message = $this->load->view('errors/submitajaxview',$data, TRUE);//load view for message to user
         $this->output->set_content_type('application/json')//return json array
                      ->set_output(json_encode(array("message" => $result_message)));
+	}
+
+
+	public function exportpreventive($tip, $status) {
+		//load our new PHPExcel library
+		$this->load->library('excel');
+		//activate worksheet number 1
+		$this->excel->setActiveSheetIndex(0);
+		//name the worksheet
+		$worksheetname = 'Overtime';
+		$this->excel->getActiveSheet()->setTitle($worksheetname);
+		$this->excel->getActiveSheet()->getDefaultStyle()->getFont()->setName('Tahoma');
+		$this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(45.29);
+		$this->excel->getActiveSheet()->getRowDimension('1')->setRowHeight(42.75);
+		//set cell A1 content with some text
+
+		$array = array("A"=>"Sitecode","B"=>"Name","C"=>"Tip","D"=>"Provereni Alarmi","E"=>"Izmerena Struja","F"=>"Vizuelna Provera","G"=>"Status","H"=>"Uradjen");
+
+		$keys = array_keys($array);
+
+		for($i=0;$i<count($array);$i++) {
+			$this->excel->getActiveSheet()->setCellValue($keys[$i] . "1", $array[array_keys($array)[$i]]);
+			//change the font size
+			$this->excel->getActiveSheet()->getStyle($keys[$i] . "1")->getFont()->setSize(8);
+			//make the font become bold
+			$this->excel->getActiveSheet()->getStyle($keys[$i] . "1")->getFont()->setBold(true);
+			//set aligment to center for that merged cell (A1 to D1)
+			$this->excel->getActiveSheet()->getStyle($keys[$i] . "1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$this->excel->getActiveSheet()->getStyle($keys[$i] . "1")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+			$this->excel->getActiveSheet()->getColumnDimension($keys[$i])->setAutoSize(true);
+
+			$this->excel->getActiveSheet()->getStyle($keys[$i] . "1")->applyFromArray(
+			    array(
+			        'borders' => array(
+					    'outline' => array(
+					      'style' => PHPExcel_Style_Border::BORDER_THIN
+					    )
+			        )
+			    )
+			);			
+		}
+
+		$this->load->model("preventivemodel");
+
+		$locations = $this->preventivemodel->get_filtered_sites($tip, $status);
+
+		$brojac = 2;
+
+		foreach($locations as $row) {
+
+			$array = array("A"=>$row->sitecode,"B"=>$row->name,"C"=>$row->tip,"D"=>$row->provereni_alarmi,"E"=>$row->izmerena_struja,"F"=>$row->vizuelna_provera,"G"=>$row->status,"H"=>$row->uradjen);		
+
+			$keys = array_keys($array);
+
+
+			for($i=0;$i<count($array);$i++) {
+				$this->excel->getActiveSheet()->setCellValue($keys[$i] . $brojac, $array[array_keys($array)[$i]]);
+				//change the font size
+				$this->excel->getActiveSheet()->getStyle($keys[$i] . $brojac)->getFont()->setSize(9);
+				//set aligment to center for that merged cell (A1 to D1)
+				$this->excel->getActiveSheet()->getStyle($keys[$i] . $brojac)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+				$this->excel->getActiveSheet()->getStyle($keys[$i] . $brojac)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+				$this->excel->getActiveSheet()->getColumnDimension($keys[$i])->setAutoSize(true);
+
+				$this->excel->getActiveSheet()->getStyle($keys[$i] . $brojac)->applyFromArray(
+				    array(
+				        'borders' => array(
+						    'outline' => array(
+						      'style' => PHPExcel_Style_Border::BORDER_THIN
+						    )
+				        )
+				    )
+				);			
+			}
+			$brojac++;
+
+		}
+
+
+		$filename="Preventive.xls"; //save our workbook as this file name
+		header('Content-Type: application/vnd.ms-excel'); //mime type
+		header('Content-Disposition: attachment;filename="'.$filename.'"'); //tell browser what's the file name
+		header('Cache-Control: max-age=0'); //no cache
+		            
+		//save it to Excel5 format (excel 2003 .XLS file), change this to 'Excel2007' (and adjust the filename extension, also the header mime type)
+		//if you want to save it as .XLSX Excel 2007 format
+		$objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');  
+		//force user to download the Excel file without writing it to server's HD
+		$objWriter->save('php://output');		
 	}	
 
 

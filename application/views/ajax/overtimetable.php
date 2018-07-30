@@ -8,6 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <th class="text-center"><?php echo $this->lang->line('Description') ?></th>
 <th class="text-center"><?php echo $this->lang->line('Date') ?></th>
 <th class="text-center">Status</th>
+<th class="text-center"><?php echo $this->lang->line('Overtime Type') ?></th>
 <th class="text-center"><?php echo $this->lang->line('Comment') ?></th>
 <th class="text-center"><?php echo $this->lang->line('Action') ?></th>
 </tr>
@@ -27,6 +28,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php elseif($row->status == 2):?>
 <td class="text-center"><small class="label label-danger"><i class="fa fa-clock-o"></i> <?php echo $this->lang->line('Declined') ?></small></td>
 <?php endif;?>
+<td class="text-center"><?php echo $row->overtime_type ?></td>
 <td class="text-center"><?php echo $row->comment ?></td>
 <?php if($row->status == 0):?>
 <td class="text-center"><a href="<?php echo base_url('bxmtime/delete/'. $row->id . '/' . $row->identifier);?>" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;</td>

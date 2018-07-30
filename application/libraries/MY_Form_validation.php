@@ -21,11 +21,22 @@ class MY_Form_validation extends CI_Form_validation{
 	    $submitted_month = $submitted_date['month'];
 	    $submitted_year = $submitted_date['year'];
 	    $server_month = date('m');
-	    if (($submitted_month != $server_month) || ($submitted_year != date('Y'))) {
+	    if ($submitted_year != date('Y')) {
 	    	return FALSE;
 	    }
-	    else {
+	    else if($submitted_month != $server_month && ($server_month - $submitted_month != 1)){
+	    	return FALSE;
+	    }
+	    else if ($submitted_month == $server_month) {
 	    	return TRUE;
+	    }
+	    else {
+	    	if (date('d') > 3) {
+	    		return FALSE;
+	    	}
+	    	else {
+	    		return TRUE;
+	    	}
 	    }
 	}
 	public function is_current_month_sick($str)

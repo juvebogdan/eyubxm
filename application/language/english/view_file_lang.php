@@ -75,3 +75,4 @@ $lang['Assigned to'] = 'Assigned to';
 $lang['Status'] = 'Status';
 $lang['Deadline'] = 'Deadline';
 $lang['Created'] = 'Created';
+$lang['Overtime Type'] = 'Overtime Type';

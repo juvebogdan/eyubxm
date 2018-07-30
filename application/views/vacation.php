@@ -20,9 +20,7 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
         <li class='active'><a href="<?php echo base_url()?>bxmtime/vacation"><i class="fa fa-calendar-o"></i> <span><?php echo $this->lang->line('Vacation') ?></span></a></li>
         <li><a href="<?php echo base_url()?>bxmtime/sickleave"><i class="fa fa-heartbeat"></i> <span><?php echo $this->lang->line('Sick leave') ?></span></a></li>
         <li><a href="<?php echo base_url()?>bxmtime/taskoverview"><i class="fa fa-desktop"></i> <span><?php echo $this->lang->line('Task Overview') ?></span></a></li>
-        <li><a href="<?php echo base_url()?>bxmtime/cars"><i class="fa fa-car"></i> <span>Dodavanje vozila</span></a></li>
-        <li><a href="<?php echo base_url()?>bxmtime/kilometraza"><i class="fa fa-dashboard"></i> <span>Kilometraza</span></a></li>         
-        <li><a href="<?php echo base_url()?>bxmtime/carproblems"><i class="fa fa-legal"></i> <span>Problemi sa vozilima</span></a></li>                      
+        <li><a href="<?php echo base_url()?>preventive/"><i class="fa fa-list-alt"></i> <span>Preventive</span></a></li>                      
       </ul>
       <!-- /.sidebar-menu -->
     </section>
@@ -82,14 +80,14 @@ defined('BASEPATH') OR exit('No direct script access allowed'); ?>
                       </select>                
                 </div>              
               </div>               
-              <div class="row">
+<!--               <div class="row">
                 <div class="col-md-12" id="filesarea" style="margin-top: 10px;">
                 </div>
-              </div>           
+              </div> -->           
             </div>
             <!-- /.box-body -->
             <div class="box-footer">
-            <button type="button" id="addfiles" class="btn btn-primary btn-lrg"><?php echo $this->lang->line('Add More files') ?></button>
+<!--             <button type="button" id="addfiles" class="btn btn-primary btn-lrg"><?php echo $this->lang->line('Add More files') ?></button> -->
             <button type="submit" class="btn btn-primary btn-lrg ajax pull-right" title="Ajax Request">
               <i class="fa fa-sign-in"></i>&nbsp; <?php echo $this->lang->line('Submit') ?>
             </button>
@@ -283,20 +281,20 @@ var table;
       });
     }
 
-    $('#addfiles').on('click',function(e) {
-        e.preventDefault();
-        addFileInput();
-    });
+    // $('#addfiles').on('click',function(e) {
+    //     e.preventDefault();
+    //     addFileInput();
+    // });
 
-    function addFileInput() {
-      var html = '';
-      html += '<div class="alert alert-info">';
-      html += '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>';
-      html += '<strong>Upload file</strong>';
-      html += '<input type="file" name="multipleFiles[]">';
-      html += '</div>';
-      $('#filesarea').append(html);
-    }  
+    // function addFileInput() {
+    //   var html = '';
+    //   html += '<div class="alert alert-info">';
+    //   html += '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>';
+    //   html += '<strong>Upload file</strong>';
+    //   html += '<input type="file" name="multipleFiles[]">';
+    //   html += '</div>';
+    //   $('#filesarea').append(html);
+    // }  
 </script>
 </body>
 </html>
